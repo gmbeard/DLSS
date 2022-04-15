@@ -1,0 +1,31 @@
+# Protect against multiple inclusion...
+if(TARGET DLSS::dlss)
+    return()
+endif()
+
+get_filename_component(_IMPORT_PREFIX "${CMAKE_CURRENT_LIST_FILE}" PATH)
+get_filename_component(_IMPORT_PREFIX "${_IMPORT_PREFIX}" PATH)
+get_filename_component(_IMPORT_PREFIX "${_IMPORT_PREFIX}" PATH)
+get_filename_component(_IMPORT_PREFIX "${_IMPORT_PREFIX}" PATH)
+if(_IMPORT_PREFIX STREQUAL "/")
+  set(_IMPORT_PREFIX "")
+endif()
+
+add_library(DLSS::dlss STATIC IMPORTED)
+
+set_target_properties(
+    DLSS::dlss
+    PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES "${_IMPORT_PREFIX}/include"
+        INTERFACE_LINK_LIBRARIES "@DLSS_LINK_LIBRARIES@"
+        IMPORTED_LOCATION "${_IMPORT_PREFIX}/lib/@DLSS_ARCHIVE_NAME@"
+)
+
+add_library(DLSS::runtime SHARED IMPORTED)
+
+set_target_properties(
+    DLSS::runtime
+    PROPERTIES
+        IMPORTED_LOCATION "${_IMPORT_PREFIX}/lib/@DLSS_SHARED_LIB_NAME@"
+        IMPORTED_SONAME "@DLSS_SHARED_LIB_NAME@"
+)
